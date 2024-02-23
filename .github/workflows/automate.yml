@@ -48,10 +48,10 @@ jobs:
               env:
                 ECR_REGISRY: ${{steps.login-ecr.outputs.registry}}
                 IMAGE_TAG: ${{github.sha}}
-              run:
+              run: |
                 docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-                
+
             - name: Fill in the image uri in ECS task definition
               id: task-def
               uses: aws-actions/amazon-ecs-render-task-definition@v1
