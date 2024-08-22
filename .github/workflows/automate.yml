@@ -35,5 +35,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
             context: ./
-            tags: ghcr.io/amaan/flask-pred:latest
+            tags: ghcr.io/amaan39/flask-pred:latest
             push: true
