@@ -1,0 +1,37 @@
+name: Download model from Azure and deploy model git hub packages
+
+on:
+    push:
+        branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Authenticate with Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: set auto-install of extensions
+        run: az config set extension.use_dynamic_install=yes_without_prompt
+
+      - name: attach workspace
+        run: az ml folder attach -w "Myworkspace" -g "DefaultResourceGroup-EUS"
+
+      - name: retrieve the model
+        run: az ml model download -t "." --model-id "loan-pred:1"
+      
+      - name: Login to github container registry
+        uses: docker/login-action@v1
+        with:
+            registry: ghcr.io
+            username: ${{github.repository_owner}}
+            password: ${{secrets.GH_REGISTRY}}
+    
+      - name: build app and push to ghcr
+        uses: docker/build-push-action@v2
+        with:
+            context: ./
+            tags: ghcr.io/amaan/flask-pred:latest
+            push: true
